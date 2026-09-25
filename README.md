@@ -145,3 +145,72 @@
   .catch((err)=>{
     console.log("DB is not Established....)
   })
+
+
+
+# Schema Creation
+
+    we are using mongoose to create schema ( schema => it restrict the field that should be specific type)
+
+ src > models > user.js
+
+  1. const mongoose = require('mongoose) 
+
+  2. const userSchema = new mongoose.Schema({
+
+   <!-- CamelCase is best approach to write parameters -->
+
+     firstName:{
+        type: String
+     },
+     lastName:{
+        type:String
+     },
+     emailId:{
+        type: String
+     },
+     password:{
+        type: String
+     },
+     gender:{
+        type: String
+     },
+     photoUrl:{
+        type: String
+     },
+     age:{
+        type: Number
+     },
+     mobile:{
+        type: Number
+     }
+  })
+
+ 3. module.exports = mongoose.model("User", userSchema);
+
+
+# Create new user using schema and store in Collection in Cluster
+
+1. const User = require('path of the user model')
+
+1. serverName.post('/signUp', async(req, res)=>{
+     try{
+      const userData= {
+        firstName:"Nageswara Rao Velama",
+        emailId:"nageswar@gmail.com",
+        password:"Nageswar@1273"
+      }
+      const user = new User(userData) 
+      await user.save();
+      res.status(201).json({
+        message:"profile created successfully",
+        data: user
+      })
+     }
+     catch(err){
+      res.status(400).json({
+        message:"Something went Wrong"
+      })
+     }
+})
+
