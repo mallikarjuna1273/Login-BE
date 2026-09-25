@@ -214,3 +214,83 @@
      }
 })
 
+
+# Feed api to get all created account information
+ 
+  => to read json data , need to add express.json()
+
+  1. serverName.use(express.json()) ; it will convert json into js
+ 
+  2. serverName.get('/users', async(req, res)=>{
+    try{
+        const usersList = User.find({})
+        res.status(200).json({
+            message :"UserDetails fetched successfully",
+            data:usersList
+        })
+    }
+    catch(err){
+        res.status(400).json({
+            message:"Something went wrong"
+        })
+    }
+  })
+
+# get specific user info
+
+  1. serverName.get('/user', async(req, res)=>{
+    try{
+        const userId= req.body.userId;
+        const user = await User.find({_id:userId})
+        res.status(200).json({
+            message:"user details fetched successfully",
+            data: user
+        })
+    }
+    catch(err){
+        res.status(400).json({
+            message: "Something went wrong"
+        })
+    }
+  })
+
+# delete user by userId
+
+ 1. serverName.delete('/user', async(req, res)=>{
+    try{
+        const userId= req.body.userId;
+        const user = await user.findIdAndDelete(userId)
+        res.status(200).json({
+            message:"user deleted successfully"
+        }) 
+    }
+    catch(err){
+        res.status(400).json({
+            message:"Something went wrong"
+        })
+    }
+ })
+
+
+# update user info by userId
+
+ 1. serverName.patch('/user', async(req, res)=>{
+    try{
+        const userId = req.body.userId;
+
+        const details = req.body;
+
+        const user = await User.findByIdAndUpdate(userId, {req.body})
+        await user.save()
+
+        res.status(201).json({
+            message:"user details updated successfully"
+        })
+    }
+    catch(err){
+        res.status(400).json({
+            message:"Something went wrong"
+        })
+    }
+ })
+
