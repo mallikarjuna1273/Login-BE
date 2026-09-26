@@ -19,7 +19,11 @@
   },
   "homepage": "https://github.com/mallikarjuna1273/Login-BE#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "express": "^5.2.1",
-    "mongoose": "^9.10.2"
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.10.2",
+    "validator": "^13.15.35"
   }
 }

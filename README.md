@@ -193,14 +193,17 @@
 
 1. const User = require('path of the user model')
 
-1. serverName.post('/signUp', async(req, res)=>{
+2. const bcrypt = require('bcrypt'); (it'll encrypt password)
+
+3. serverName.post('/signUp', async(req, res)=>{
      try{
-      const userData= {
+      <!-- const userData= {
         firstName:"Nageswara Rao Velama",
         emailId:"nageswar@gmail.com",
         password:"Nageswar@1273"
-      }
-      const user = new User(userData) 
+      } -->
+      const passwordHash = await bcrypt.hash(req.body.password, 10);
+      const user = new User({firstName, emailId, password: passwordHash, about, gender, photoUrl,interests}) 
       await user.save();
       res.status(201).json({
         message:"profile created successfully",
@@ -293,4 +296,58 @@
         })
     }
  })
+
+
+# Login api
+
+   1. first need to check validations 
+   2. email is valid or not
+   3. password is correct or not
+   4. if both email and password are correct, send a jwt token to cookie
+
+   # required packages to protect password bcrypt
+
+     1. const bcrypt = require("bcrypt")
+     2. const jwt = require('jsonwebtoken)
+     3. const cookieParser = require('cookie-parser') => (to read cookie)
+     3. serverName.use(cookieParser())
+     3. serverName.post('/login', async(req, res)=>{
+        const {emailId, password} = req.body;
+        const user= await User.find({emailId:emailId})
+        if(user.length === 0){
+            throw new error("invalid credentials")
+        }
+        else{
+            const passwordCompare =await bcrypt.compare(password, user.password)
+            if(!passwordCompare){
+                throw new Error("invalid credentials")
+            }
+
+           const token = await jwt.sign({_id:user._id}, "SECRET_KEY", {expiresIn:"1d"})
+
+            res.cookie('token', token).status(200).json({
+                message:`{user.firstName} you are logged in successfully`,
+                data: user
+            })
+        }
+     })
+
+
+# logout api
+
+   1. serverName.post('/logout', (req, res)=>{
+    res.cookie('token', null, {expires: new Date(Date.now())}).status(200).json({
+        message:"Logout successfully"
+    })
+   })
+
+# need to add validations to restrict to user 
+
+# encrypt password (bcrypt)
+
+# jwt token for authentication
+
+# auth middleware 
+
+# schema.models to offload functionalities
 

@@ -1,16 +1,25 @@
 const express = require("express");
 
+
+
 const connectDB = require("./config/db");
 const User = require("./models/user");
 const { PORT } = require("./utils/constants");
-
+const bcrypt = require('bcrypt')
+const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
 const server = express();
 
 server.use(express.json())
+server.use(cookieParser())
+
+// signup
 
 server.post("/signUp", async (req, res) => {
   try {
-    const user = new User(req.body);
+    const {firstName, emailId, password} = req.body;
+    const hashPassword = await bcrypt.hash(password, 10)
+    const user = new User({firstName, emailId, password:hashPassword});
     await user.save();
     res.status(201).json({
         message:"Profile created successfully",
@@ -18,10 +27,43 @@ server.post("/signUp", async (req, res) => {
     })
   } catch (err) {
     res.status(400).json({
-      message: "Something went wrong ...",
+      message: err.message,
     });
   }
 });
+
+// login
+
+ server.post('/login', async(req, res)=>{
+    try{
+       const {emailId, password} = req.body;
+
+       const user = await User.findOne({emailId:emailId})
+       console.log(user,"user")
+       if(!user){
+        res.status(400).json({message:"Enter a valid credentials"})
+       }
+       console.log(user.password,"pwd")
+        const passwordCompare = await bcrypt.compare(password, user.password)
+
+        if(!passwordCompare){
+            res.status(400).json({message:"Enter a valid credentials"})
+        }
+      const token = await jwt.sign({_id:user._id}, "SECRET_KEY", {expiresIn:"1h"})
+
+      res.cookie('token', token).status(200).json({
+        message:`${user.firstName} you are loggedIn successfully`,
+        data: user
+      })
+    }
+    catch(err){
+        res.status(400).json({
+            message: err.message
+        })
+    }
+ })
+
+
 
 // feed api
 
@@ -100,7 +142,7 @@ server.patch('/user', async(req, res)=>{
        const userDetails = req.body;
     //    console.log(req.body)
 
-       const user = await User.findByIdAndUpdate({_id:userId}, userDetails)
+       const user = await User.findByIdAndUpdate({_id:userId}, userDetails, {returnDocument: "after"})
        console.log(user,"user")
        await user.save()
        res.status(201).json({
@@ -114,19 +156,6 @@ server.patch('/user', async(req, res)=>{
         })
     }
 })
-
-// server.all('/test', (req, res)=>{
-//     res.end("hiii i'm from test")
-// })
-// server.use('/hello', (req, res)=>{
-//     res.end("hiii i'm from helloo")
-// })
-// server.use('/hii', (req, res)=>{
-//     res.end("hiii i'm from hii")
-// })
-// server.use('/', (req, res)=>{
-//     res.end("route is mismatched")
-// })
 
 connectDB()
   .then(() => {
