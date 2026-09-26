@@ -10,12 +10,14 @@ const server = express();
 
 const { authRouter } = require("./routes/auth");
 const { profileRouter } = require("./routes/profile");
+const connectionRouter = require("./routes/connection");
 
 server.use(express.json());
 server.use(cookieParser());
 
 server.use("/", authRouter);
 server.use("/", profileRouter);
+server.use('/', connectionRouter)
 
 connectDB()
   .then(() => {

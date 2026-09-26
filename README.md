@@ -380,3 +380,48 @@
 
 # schema.models to offload functionalities
 
+
+
+
+# connection request api's , send request , reject request
+
+  ## corner cases
+
+    1. we can able to send request one time only 
+
+    2. we can't able to send request to ourself
+
+    3. we can't able to send request to the person , already get request from other side
+
+  ## schema for store connection
+
+    const connectionRequestSchema = new mongoose.Schema({
+        fromUserId:{
+            type: mongoose.Schema.types.objectId,
+            required: true
+        },
+        toUserId:{
+            type: mongoose.Schema.types.objectId,
+            required: true
+        },
+        statue:{
+            type: String,
+            enum:{
+                values: ["interested","ignored", "accepted", "rejected"],
+                message: `{VALUE} is not valid status`
+            }
+        }
+    },{timestamps:true})
+
+  ## this is for adding compound index (helpful to search result from million records)
+    
+    connectionRequestSchema.index({fromUserId:1, toUserId:1})
+
+  ## to check both fromUserId and toUserId same , every new connection
+
+   connectionRequestSchema.pre('save', function(next){
+    connectionRequest = this;
+    if(connectionRequest.fromUserId.equals(connectionRequest.toUserId)){
+        throw new error("connection request is not valid")
+    }
+   })
