@@ -341,6 +341,35 @@
     })
    })
 
+
+# middleware to use authentication where jwt is required
+
+  ##  userAuth helper function
+   
+    1. const cookieParser= require('cookie-parser'); (to read cookie)
+     
+    1. const userAuth = async(req, res, next)=>{
+        const cookie= req.cookies;
+        const {token} = cookie;
+       if(!token){
+        res.status(400).json({
+            message:"Token is not valid"
+        })
+       }
+       const decryptMessage = await jwt.verify(token,"SECRET_KEY")
+
+       const {_id} = decryptMessage
+
+       const user = await User.find(_id)
+       if(!user){
+        res.status(400).json({
+            message:"User not found"
+        })
+       }
+       req.user = user;
+       next()
+    } 
+
 # need to add validations to restrict to user 
 
 # encrypt password (bcrypt)

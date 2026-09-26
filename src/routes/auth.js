@@ -30,11 +30,11 @@ authRouter.post("/login", async (req, res) => {
     const { emailId, password } = req.body;
 
     const user = await User.findOne({ emailId: emailId });
-    console.log(user, "user");
+    // console.log(user, "user");
     if (!user) {
       res.status(400).json({ message: "Enter a valid credentials" });
     }
-    console.log(user.password, "pwd");
+    // console.log(user.password, "pwd");
     const passwordCompare = await bcrypt.compare(password, user.password);
 
     if (!passwordCompare) {
