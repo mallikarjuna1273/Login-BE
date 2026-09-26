@@ -56,6 +56,6 @@ const userSchema = new mongoose.Schema({
         type:[String],
         maxLength:[10, "Interests must be less than 10 only"]
     }
-})
+}, {timestamps: true})
 
 module.exports = mongoose.model("User", userSchema)
