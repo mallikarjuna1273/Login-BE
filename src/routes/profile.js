@@ -9,7 +9,6 @@ profileRouter.use(express.json());
 profileRouter.get("/user", userAuth, async (req, res) => {
   try {
     const user = req.user;
-    //   console.log(userInfo)
     if (user.length === 0) {
       res.status(200).json({
         message: "User not found",
@@ -29,27 +28,23 @@ profileRouter.get("/user", userAuth, async (req, res) => {
 
 // update user
 
-profileRouter.patch("/profile/edit", userAuth, async(req, res) => {
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
     const userInfo = req.user[0];
 
-    // const {firstName, emailId} = userInfo[0];
-    console.log(userInfo)
+    const allowedUpdates = ["firstName", "interests", "gender", "age"];
 
-    const allowedUpdates = ["firstName", "interests","gender","age"];
-
-    const isValidUpdates = Object.keys(req.body).every((i) =>{
-      return allowedUpdates.includes(i)
-  });
+    const isValidUpdates = Object.keys(req.body).every((i) => {
+      return allowedUpdates.includes(i);
+    });
 
     if (!isValidUpdates) {
       res.status(400).json({
-        message: "updates are not allowed"
+        message: "updates are not allowed",
       });
     }
 
-
-      Object.keys(req.body).forEach((key) => userInfo[key] = req.body[key])
+    Object.keys(req.body).forEach((key) => (userInfo[key] = req.body[key]));
     await userInfo.save();
     res.status(200).json({
       message: "Details are updated successfully",
@@ -85,19 +80,18 @@ profileRouter.delete("/user", async (req, res) => {
   }
 });
 
-profileRouter.get('/users',userAuth, async(req, res)=>{
-    try{
-        const usersList = await User.find({})
-        res.status(200).json({
-            message:"userList fetched successfully",
-            data: usersList
-        })
-    }
-    catch(err){
-        res.status(400).json({
-            message: "Something went wrong"
-        })
-    }
-})
+profileRouter.get("/users", userAuth, async (req, res) => {
+  try {
+    const usersList = await User.find({});
+    res.status(200).json({
+      message: "userList fetched successfully",
+      data: usersList,
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong",
+    });
+  }
+});
 
 module.exports = { profileRouter };

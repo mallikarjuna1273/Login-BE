@@ -1,8 +1,8 @@
 const express = require("express");
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-const User = require('../models/user')
+const User = require("../models/user");
 
 const authRouter = express.Router();
 
@@ -30,11 +30,9 @@ authRouter.post("/login", async (req, res) => {
     const { emailId, password } = req.body;
 
     const user = await User.findOne({ emailId: emailId });
-    // console.log(user, "user");
     if (!user) {
       res.status(400).json({ message: "Enter a valid credentials" });
     }
-    // console.log(user.password, "pwd");
     const passwordCompare = await bcrypt.compare(password, user.password);
 
     if (!passwordCompare) {
@@ -60,10 +58,13 @@ authRouter.post("/login", async (req, res) => {
 
 // logout
 
-authRouter.post('/logout', (req, res)=>{
-    res.cookie('token', null, {expires: new Date(Date.now())}).status(200).json({
-        message: "Logout successfully"
-    })
-})
+authRouter.post("/logout", (req, res) => {
+  res
+    .cookie("token", null, { expires: new Date(Date.now()) })
+    .status(200)
+    .json({
+      message: "Logout successfully",
+    });
+});
 
 module.exports = { authRouter };

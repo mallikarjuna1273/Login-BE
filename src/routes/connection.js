@@ -14,9 +14,7 @@ connectionRouter.post(
     try {
       const user = req.user;
 
-      const fromUserId = user[0]["_id"]
-      console.log(user[0]["_id"], "from")
-
+      const fromUserId = user[0]["_id"];
 
       const { status, toUserId } = req.params;
 
@@ -28,7 +26,6 @@ connectionRouter.post(
       }
 
       const isValidToUserId = await User.findOne({ _id: toUserId });
-
 
       if (!isValidToUserId) {
         throw new error("User Not found");
@@ -44,19 +41,18 @@ connectionRouter.post(
         return res.status(400).json({
           message: "connection request is already sent",
         });
+      } else {
+        const connectionRequest = new Connection({
+          fromUserId,
+          toUserId,
+          status,
+        });
+        await connectionRequest.save();
+        res.status(200).json({
+          message: `${user[0]["firstName"]} is sent a connection request to ${isValidToUserId.firstName}`,
+          data: connectionRequest,
+        });
       }
-      else{
-      const connectionRequest = new Connection({
-        fromUserId,
-        toUserId,
-        status,
-      });
-      await connectionRequest.save();
-      res.status(200).json({
-        message: `${user[0]["firstName"]} is sent a connection request to ${isValidToUserId.firstName}`,
-        data: connectionRequest,
-      });
-    }
     } catch (err) {
       res.status(400).json({
         message: err.message,
